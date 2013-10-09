@@ -8,7 +8,7 @@ public class MouseListen implements MouseListener
 	@Override
 	public void mouseClicked(MouseEvent arg0)
 	{
-		Controller.inst().makeTriangle(arg0.getPoint());
+		Controller.inst().clicked(arg0.getPoint());
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class MouseListen implements MouseListener
 	@Override
 	public void mouseReleased(MouseEvent arg0)
 	{
-		Controller.inst().updateShape(arg0.getPoint());		
+		Controller.inst().finishUpdate();		
 	}
 
 }

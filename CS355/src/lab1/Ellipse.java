@@ -1,43 +1,35 @@
 package lab1;
 
 import java.awt.Color;
-import java.awt.Point;
 
 public class Ellipse extends Shape
 {
-	private Point center;
-	private int height;
-	private int width;
+	private double height;
+	private double width;
 	
-	public Ellipse(Color color, Point center, int height, int width)
+	public Ellipse(Color color, MyPoint center, double height, double width)
 	{
-		super(color);
-		this.center = center;
+		super(color, center, 0);
 		this.height = height;
 		this.width = width;
 	}
 	
-	public Point getCenter()
-	{
-		return center;
-	}
-	public void setCenter(Point temp)
-	{
-		this.center = temp;
-	}
-	public int getHeight()
+	public double getHeight()
 	{
 		return height;
 	}
-	public void setHeight(int height)
+	
+	public void setHeight(double height)
 	{
 		this.height = height;
 	}
-	public int getWidth()
+	
+	public double getWidth()
 	{
 		return width;
 	}
-	public void setWidth(int width)
+	
+	public void setWidth(double width)
 	{
 		this.width = width;
 	}

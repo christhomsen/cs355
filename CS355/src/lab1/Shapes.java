@@ -28,6 +28,11 @@ public class Shapes
     	return shapes.get(index);
     }
     
+    public int indexOf(Shape shape)
+    {
+    	return shapes.indexOf(shape);
+    }
+    
     public List<Shape> getShapes()
     {
     	return shapes;

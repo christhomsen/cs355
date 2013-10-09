@@ -1,36 +1,23 @@
 package lab1;
 
 import java.awt.Color;
-import java.awt.Point;
 
 public class Line extends Shape 
 {
-	private Point startPoint;
-	private Point endPoint;
+	private MyPoint endPoint;
 	
-	public Line(Color color, Point startPoint, Point endPoint)
+	public Line(Color color, MyPoint startPoint, MyPoint endPoint)
 	{
-		super(color);
-		this.startPoint = startPoint;
+		super(color, startPoint, 0);
 		this.endPoint = endPoint;
 	}
 	
-	public Point getStartPoint() 
-	{
-		return startPoint;
-	}
-	
-	public void setStartPoint(Point startPoint)
-	{
-		this.startPoint = startPoint;
-	}
-	
-	public Point getEndPoint() 
+	public MyPoint getEndPoint() 
 	{
 		return endPoint;
 	}
 	
-	public void setEndPoint(Point endPoint) 
+	public void setEndPoint(MyPoint endPoint) 
 	{
 		this.endPoint = endPoint;
 	}
