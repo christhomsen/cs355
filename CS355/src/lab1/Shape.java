@@ -46,11 +46,10 @@ public abstract class Shape
 		this.color = color;
 	}
 	
-	public AffineTransform getAffinTransformer()
+	public AffineTransform objectToWorld()
 	{
-		AffineTransform affine = new AffineTransform();
-		affine.translate(center.x, center.y);
-		affine.rotate(rotation);
+		AffineTransform affine = new AffineTransform(Math.cos(rotation), Math.sin(rotation), 
+				-Math.sin(rotation), Math.cos(rotation), center.x, center.y);
 		return affine;
 	}
 }

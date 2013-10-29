@@ -31,12 +31,17 @@ public class ViewFresher implements ViewRefresher
 		for(int i =0; i < shapeList.size(); i ++)
 		{
 			String temp = shapeList.get(i).getClass().getSimpleName();
+			double zoom = Controller.inst().getZoom();
+			AffineTransform a = new AffineTransform(zoom, 0, 0, zoom, -Controller.inst().getHorizontal()/* * zoom*/, -Controller.inst().getVertical()/* * zoom*/);
+			AffineTransform b = new AffineTransform();
 			switch (temp)
 			{
 				case "Line":
 					MyPoint start = ((Line) shapeList.get(i)).getCenter();
 					MyPoint end = ((Line) shapeList.get(i)).getEndPoint();
 					g2d.setColor(shapeList.get(i).getColor());
+					b.concatenate(a);
+					g2d.setTransform(b);
 					g2d.drawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y);
 					break;
 				case "Rectangle":
@@ -46,7 +51,9 @@ public class ViewFresher implements ViewRefresher
 					int width = (int) ((Rectangle) shapeList.get(i)).getWidth();
 					corner = new MyPoint(-width/2, -height/2);
 					g2d.setColor(shapeList.get(i).getColor());
-					g2d.setTransform(shapeList.get(i).getAffinTransformer());
+					b = shapeList.get(i).objectToWorld();
+					b.concatenate(a);
+					g2d.setTransform(b);
 					g2d.fillRect((int)corner.x, (int)corner.y, width, height);
 					g2d.setTransform(new AffineTransform());
 					break;
@@ -56,7 +63,9 @@ public class ViewFresher implements ViewRefresher
 					width = (int) ((Square) shapeList.get(i)).getWidth();
 					corner = new MyPoint(-width/2, -height/2);
 					g2d.setColor(shapeList.get(i).getColor());
-					g2d.setTransform(shapeList.get(i).getAffinTransformer());
+					b = shapeList.get(i).objectToWorld();
+					b.concatenate(a);
+					g2d.setTransform(b);
 					g2d.fillRect((int)corner.x, (int)corner.y, width, height);
 					g2d.setTransform(new AffineTransform());
 					break;
@@ -66,7 +75,9 @@ public class ViewFresher implements ViewRefresher
 					width = (int) ((Ellipse) shapeList.get(i)).getWidth();
 					corner = new MyPoint(-width/2, -height/2);
 					g2d.setColor(shapeList.get(i).getColor());
-					g2d.setTransform(shapeList.get(i).getAffinTransformer());
+					b = shapeList.get(i).objectToWorld();
+					b.concatenate(a);
+					g2d.setTransform(b);
 					g2d.fillOval((int)corner.x, (int)corner.y, width, height);
 					g2d.setTransform(new AffineTransform());
 					break;
@@ -76,7 +87,9 @@ public class ViewFresher implements ViewRefresher
 					width = (int) ((Circle) shapeList.get(i)).getWidth();
 					corner = new MyPoint(-width/2, -height/2);
 					g2d.setColor(shapeList.get(i).getColor());
-					g2d.setTransform(shapeList.get(i).getAffinTransformer());
+					b = shapeList.get(i).objectToWorld();
+					b.concatenate(a);
+					g2d.setTransform(b);
 					g2d.fillOval((int)corner.x, (int)corner.y, width, height);
 					g2d.setTransform(new AffineTransform());
 					break;
@@ -91,7 +104,9 @@ public class ViewFresher implements ViewRefresher
 					y[2] = (int) (((Triangle) shapeList.get(i)).getThirdPoint().y);
 					Polygon triangle = new Polygon(x, y, 3);
 					g2d.setColor(shapeList.get(i).getColor());
-					g2d.setTransform(shapeList.get(i).getAffinTransformer());
+					b = shapeList.get(i).objectToWorld();
+					b.concatenate(a);
+					g2d.setTransform(b);
 					g2d.fillPolygon(triangle);
 					g2d.setTransform(new AffineTransform());
 					break;
@@ -107,6 +122,10 @@ public class ViewFresher implements ViewRefresher
 			double shapeHeight = 0;
 			MyPoint pointHeight = new MyPoint();
 			Color color = null;
+			double zoom = Controller.inst().getZoom();
+			AffineTransform a = new AffineTransform(zoom, 0, 0, zoom, -Controller.inst().getHorizontal()/* * zoom*/, -Controller.inst().getVertical()/* * zoom*/);
+			AffineTransform b = new AffineTransform();
+			
 			if(crrntShape.getColor() != Color.WHITE)
 				color = new Color(255 - crrntShape.getColor().getRGB());
 			else
@@ -121,7 +140,9 @@ public class ViewFresher implements ViewRefresher
 					int height = (int) ((Rectangle) crrntShape).getHeight();
 					int width = (int) ((Rectangle) crrntShape).getWidth();
 					corner = new MyPoint(-width/2, -height/2);
-					g2d.setTransform(crrntShape.getAffinTransformer());
+					b = crrntShape.objectToWorld();
+					b.concatenate(a);
+					g2d.setTransform(b);
 					g2d.setColor(color);
 					g2d.drawRect((int)corner.x, (int)corner.y, width, height);
 					g2d.setTransform(new AffineTransform());
@@ -137,7 +158,9 @@ public class ViewFresher implements ViewRefresher
 					width = (int) ((Square) crrntShape).getWidth();
 					corner = new MyPoint(-width/2, -height/2);
 					g2d.setColor(color);
-					g2d.setTransform(crrntShape.getAffinTransformer());
+					b = crrntShape.objectToWorld();
+					b.concatenate(a);
+					g2d.setTransform(b);
 					g2d.drawRect((int)corner.x, (int)corner.y, width, height);
 					g2d.setTransform(new AffineTransform());
 					shapeHeight = height/2;
@@ -152,7 +175,9 @@ public class ViewFresher implements ViewRefresher
 					width = (int) ((Ellipse) crrntShape).getWidth();
 					corner = new MyPoint(-width/2, -height/2);
 					g2d.setColor(color);
-					g2d.setTransform(crrntShape.getAffinTransformer());
+					b = crrntShape.objectToWorld();
+					b.concatenate(a);
+					g2d.setTransform(b);
 					g2d.drawOval((int)corner.x, (int)corner.y, width, height);
 					g2d.setTransform(new AffineTransform());
 					shapeHeight = height/2;
@@ -167,7 +192,9 @@ public class ViewFresher implements ViewRefresher
 					width = (int) ((Circle) crrntShape).getWidth();
 					corner = new MyPoint(-width/2, -height/2);
 					g2d.setColor(color);
-					g2d.setTransform(crrntShape.getAffinTransformer());
+					b = crrntShape.objectToWorld();
+					b.concatenate(a);
+					g2d.setTransform(b);
 					g2d.drawOval((int)corner.x, (int)corner.y, width, height);
 					g2d.setTransform(new AffineTransform());
 					shapeHeight = height/2;
@@ -187,7 +214,9 @@ public class ViewFresher implements ViewRefresher
 					y[2] = (int) (((Triangle) crrntShape).getThirdPoint().y);
 					Polygon triangle = new Polygon(x, y, 3);
 					g2d.setColor(color);
-					g2d.setTransform(crrntShape.getAffinTransformer());
+					b = crrntShape.objectToWorld();
+					b.concatenate(a);
+					g2d.setTransform(b);
 					g2d.drawPolygon(triangle);
 					g2d.setTransform(new AffineTransform());
 					pointHeight = new MyPoint(-((Triangle) crrntShape).getFirstPoint().x, -((Triangle) crrntShape).getFirstPoint().y);
@@ -206,7 +235,9 @@ public class ViewFresher implements ViewRefresher
 					int width = (int) ((Circle) handles.get(i).getShape()).getWidth();
 					corner = new MyPoint(-width/2, -height/2);
 					g2d.setColor(color);
-					g2d.setTransform(crrntShape.getAffinTransformer());
+					b = crrntShape.objectToWorld();
+					b.concatenate(a);
+					g2d.setTransform(b);
 					g2d.fillOval((int)(points.get(i - 1).x + corner.x), (int)(points.get(i - 1).y + corner.y), width, height);
 					g2d.setTransform(new AffineTransform());
 				}
@@ -220,7 +251,9 @@ public class ViewFresher implements ViewRefresher
 					int width = (int) ((Circle) handles.get(i).getShape()).getWidth();
 					corner = new MyPoint(-width/2, -height/2);
 					g2d.setColor(color);
-					g2d.setTransform(crrntShape.getAffinTransformer());
+					b = crrntShape.objectToWorld();
+					b.concatenate(a);
+					g2d.setTransform(b);
 					g2d.fillOval((int)(points.get(i).x + corner.x), (int)(points.get(i).y + corner.y), width, height);
 					g2d.setTransform(new AffineTransform());
 				}
@@ -246,7 +279,9 @@ public class ViewFresher implements ViewRefresher
 				corner = new MyPoint(-width / 2, -height / 2);
 				MyPoint point = new MyPoint(0, -shapeHeight - 20);
 				g2d.setColor(color);
-				g2d.setTransform(crrntShape.getAffinTransformer());
+				b = crrntShape.objectToWorld();
+				b.concatenate(a);
+				g2d.setTransform(b);
 				g2d.fillOval((int) (point.x + corner.x), (int) (point.y + corner.y), width, height);
 				g2d.setTransform(new AffineTransform());
 			}
@@ -257,7 +292,9 @@ public class ViewFresher implements ViewRefresher
 				int width = (int) ((Circle) handles.get(0).getShape()).getWidth();
 				corner = new MyPoint(-width/2, -height/2);
 				g2d.setColor(color);
-				g2d.setTransform(crrntShape.getAffinTransformer());
+				b = crrntShape.objectToWorld();
+				b.concatenate(a);
+				g2d.setTransform(b);
 				g2d.fillOval((int)(pointHeight.x + corner.x), (int)(pointHeight.y + corner.y), width, height);
 				g2d.setTransform(new AffineTransform());
 			}

@@ -2,6 +2,8 @@ package lab1;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,10 @@ public class Controller implements CS355Controller
 	double maxError = 5;
 	int handle = -1;
 	List<Handle> handles = new ArrayList<Handle>();
+	double zoom = 1;
+	double horizontal = 0;
+	double vertical = 0;
+	int base = 512;
 	
 	enum ControllerState
 	{
@@ -128,75 +134,101 @@ public class Controller implements CS355Controller
 	@Override
 	public void zoomInButtonHit()
 	{
-		state = ControllerState.FREE;
-		//this.totalNumPoints = 0;
-		//this.crrntShape = null;
-		//GUIFunctions.refresh();
+		if(zoom > .25)
+		{
+			zoom /= 2;
+			base /= 2;
+		}
+		//scaleHandles();
+		GUIFunctions.setHScrollBarMax(base);
+		GUIFunctions.setVScrollBarMax(base);
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void zoomOutButtonHit()
 	{
-		state = ControllerState.FREE;
-		//this.totalNumPoints = 0;
-		//this.crrntShape = null;
-		//GUIFunctions.refresh();
+		if(zoom < 4)
+		{
+			zoom *= 2;
+			base *= 2;
+		}
+		//scaleHandles();
+		GUIFunctions.setHScrollBarMax(base);
+		GUIFunctions.setVScrollBarMax(base);
+		GUIFunctions.refresh();
 	}
+
+//	private void scaleHandles()
+//	{
+//		for(int i = 0; i < handles.size(); i ++)
+//		{
+//			double temp = ((Circle) handles.get(i).getShape()).getHeight() / zoom;
+//			((Circle) handles.get(i).getShape()).setHeight(temp);
+//			((Circle) handles.get(i).getShape()).setWidth(temp);
+//		}
+//	}
 
 	@Override
 	public void hScrollbarChanged(int value)
 	{
-		state = ControllerState.FREE;
-		//this.totalNumPoints = 0;
-		//this.crrntShape = null;
-		//GUIFunctions.refresh();
+		this.horizontal = value;
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void vScrollbarChanged(int value)
 	{
-		state = ControllerState.FREE;
-		//this.totalNumPoints = 0;
-		///this.crrntShape = null;
-		//GUIFunctions.refresh();
+		this.vertical = value;
+		GUIFunctions.refresh();
 	}
 
 	public void startShape(Point topCorner)
 	{
+		MyPoint corner = new MyPoint(topCorner.x, topCorner.y);
+		corner = this.viewToWorld(corner);
 		switch (state)
 		{
 			case LINE:
-				startLine(topCorner);
+				startLine(corner);
 				break;
 			case RECT:
-				startRect(topCorner);
+				startRect(corner);
 				break;
 			case SQUA:
-				startSquare(topCorner);
+				startSquare(corner);
 				break;
 			case ELLI:
-				startEllipse(topCorner);
+				startEllipse(corner);
 				break;
 			case CIRC:
-				startCircle(topCorner);
+				startCircle(corner);
 				break;
 			case SELE:
 				if(this.crrntShape != null)
 				{
-					if(handleHitTest(new MyPoint(topCorner.x, topCorner.y)))
+					System.out.println("well the current shape isn't null");
+					if(handleHitTest(corner))
 					{
-						selectHandle(new MyPoint(topCorner.x, topCorner.y));						
+						System.out.println("well I'm hitting the handle");
+						selectHandle(corner);						
+					}
+					else if(!findSelected(corner))
+					{
+						this.crrntShape = null;
+						handle = -1;
 					}
 				}
 				else
 				{
-					currentPoint = new MyPoint(topCorner.x, topCorner.y);
+					currentPoint = new MyPoint(corner.x, corner.y);
 					findSelected(this.currentPoint);
 				}
 				break;
 			default:
 				break;
 		}
+		GUIFunctions.refresh();
 	}
 
 	private void selectHandle(MyPoint myPoint)
@@ -215,13 +247,13 @@ public class Controller implements CS355Controller
 		}
 	}
 
-	private void startLine(Point topCorner)
+	private void startLine(MyPoint topCorner)
 	{
 		Shape temp = new Line(currentColor, new MyPoint(topCorner.x, topCorner.y), new MyPoint(topCorner.x, topCorner.y));
 		currentShape = shapes.addShape(temp);
 	}
 
-	private void startRect(Point topCorner)
+	private void startRect(MyPoint topCorner)
 	{
 		currentStart = new MyPoint();
 		Shape temp = new Rectangle(currentColor, new MyPoint(topCorner.x, topCorner.y), 0, 0);
@@ -229,7 +261,7 @@ public class Controller implements CS355Controller
 		currentStart = new MyPoint(topCorner.x, topCorner.y);
 	}
 
-	private void startSquare(Point topCorner)
+	private void startSquare(MyPoint topCorner)
 	{
 		currentStart = new MyPoint();
 		Shape temp = new Square(currentColor, new MyPoint(topCorner.x, topCorner.y), 0);
@@ -237,7 +269,7 @@ public class Controller implements CS355Controller
 		currentStart = new MyPoint(topCorner.x, topCorner.y);
 	}
 
-	private void startEllipse(Point topCorner)
+	private void startEllipse(MyPoint topCorner)
 	{
 		currentStart = new MyPoint();
 		Shape temp = new Ellipse(currentColor, new MyPoint(topCorner.x, topCorner.y), 0, 0);
@@ -245,7 +277,7 @@ public class Controller implements CS355Controller
 		currentStart = new MyPoint(topCorner.x, topCorner.y);
 	}
 
-	private void startCircle(Point topCorner)
+	private void startCircle(MyPoint topCorner)
 	{
 		currentStart = new MyPoint();
 		Shape temp = new Circle(currentColor, new MyPoint(topCorner.x, topCorner.y), 0);
@@ -277,6 +309,7 @@ public class Controller implements CS355Controller
 	public void updateShape(Point point)
 	{
 		MyPoint myPoint = new MyPoint(point.x, point.y);
+		myPoint = this.viewToWorld(myPoint);
 		switch (state)
 		{
 		case LINE:
@@ -505,7 +538,7 @@ public class Controller implements CS355Controller
 	{
 		double x = this.crrntShape.getCenter().x - myPoint.x;
 		double y = this.crrntShape.getCenter().y - myPoint.y;
-		this.crrntShape.setRotation(Math.atan2(y, x));
+		this.crrntShape.setRotation(Math.atan2(y, x) - Math.PI/2);
 		updateHandlePos();
 		GUIFunctions.refresh();
 	}
@@ -561,15 +594,29 @@ public class Controller implements CS355Controller
 		boolean hit = false;
 		for(int i = 0; i < handles.size(); i ++)
 		{
-			double val = Math.pow((myPoint.x - handles.get(i).getShape().getCenter().x), 2);
-			val += Math.pow(myPoint.y - handles.get(i).getShape().getCenter().y, 2);
-			double radius = ((Circle) handles.get(i).getShape()).getHeight()/2;
-			if(val <= Math.pow(radius, 2))
+			Shape shape = handles.get(i).getShape();
+			MyPoint point = worldToObject(myPoint, shape);
+			double val = (point.x)/(((Ellipse) shape).getWidth()/2);
+			val = Math.pow(val, 2);
+			double val2 = (point.y)/(((Ellipse) shape).getHeight()/2);
+			val2 = Math.pow(val2, 2);
+			if((val + val2) <= 1)
 			{
 				hit = true;
 				break;
 			}
 		}
+//		for(int i = 0; i < handles.size(); i ++)
+//		{
+//			double val = Math.pow((myPoint.x - handles.get(i).getShape().getCenter().x), 2);
+//			val += Math.pow(myPoint.y - handles.get(i).getShape().getCenter().y, 2);
+//			double radius = ((Circle) handles.get(i).getShape()).getHeight()/2;
+//			if(val <= Math.pow(radius, 2))
+//			{
+//				hit = true;
+//				break;
+//			}
+//		}
 		return hit;
 	}
 
@@ -856,6 +903,7 @@ public class Controller implements CS355Controller
 	public void clicked(Point point)
 	{
 		MyPoint myPoint = new MyPoint(point.x, point.y);
+		myPoint = this.viewToWorld(myPoint);
 		switch(state)
 		{
 			case TRIA:
@@ -869,11 +917,12 @@ public class Controller implements CS355Controller
 		}
 	}
 
-	private void findSelected(MyPoint myPoint)
+	private boolean findSelected(MyPoint myPoint)
 	{
 		List<Shape> shapeList = shapes.getShapes();
 		Shape shape = null;
 		this.crrntShape = null;
+		boolean selected = false;
 		for (int i = shapeList.size() - 1; i > -1; i --)
 		{
 			shape = shapeList.get(i);
@@ -883,6 +932,7 @@ public class Controller implements CS355Controller
 					if(lineHitTest(shape, myPoint))
 					{
 						this.crrntShape = shape;
+						selected = true;
 						break;
 					}
 			}
@@ -892,10 +942,11 @@ public class Controller implements CS355Controller
 				if(Math.abs(point.x) <= ((Rectangle) shape).getWidth()/2 && Math.abs(point.y) <= ((Rectangle) shape).getHeight()/2)
 				{
 					this.crrntShape = shape;
+					selected = true;
 					break;
 				}
 			}
-			else if(temp.equals("Ellipse"))
+			else if(temp.equals("Ellipse") || temp.equals("Circle"))
 			{
 				MyPoint point = worldToObject(myPoint, shape);
 				double val = (point.x)/(((Ellipse) shape).getWidth()/2);
@@ -905,19 +956,9 @@ public class Controller implements CS355Controller
 				if((val + val2) <= 1)
 				{
 					this.crrntShape = shape;
+					selected = true;
 					break;
 				}
-			}
-			else if(temp.equals("Circle"))
-			{
-					double val = Math.pow((myPoint.x - shape.getCenter().x), 2);
-					val += Math.pow(myPoint.y - shape.getCenter().y, 2);
-					double radius = ((Circle) shape).getHeight()/2;
-					if(val <= Math.pow(radius, 2))
-					{
-						this.crrntShape = shape;
-						break;
-					}
 			}
 			else if(temp.equals("Triangle"))
 			{
@@ -927,6 +968,7 @@ public class Controller implements CS355Controller
 				if(sign(myPoint, firstV, secV) && sign(myPoint, secV, thirdV) && sign(myPoint, thirdV, firstV))
 				{
 					this.crrntShape = shape;
+					selected = true;
 					break;
 				}
 			}
@@ -936,13 +978,26 @@ public class Controller implements CS355Controller
 		{
 			drawHandles(crrntShape);
 		}
+		
+		return selected;
+	}
+	
+	private MyPoint viewToWorld(MyPoint mypoint)
+	{
+		AffineTransform affine = new AffineTransform(1/zoom, 0, 0, 1/zoom, this.horizontal, this.vertical);
+		Point2D point2d = affine.transform(mypoint, null);
+		MyPoint point = new MyPoint(point2d.getX(), point2d.getY());
+		return point;
 	}
 
 	private MyPoint worldToObject(MyPoint myPoint, Shape shape)
 	{
-		double x = Math.cos(shape.getRotation()) * myPoint.x + Math.sin(shape.getRotation()) * myPoint.y + (-Math.cos(shape.getRotation()) * shape.getCenter().x - Math.sin(shape.getRotation()) * shape.getCenter().y);
-		double y = -Math.sin(shape.getRotation()) * myPoint.x + Math.cos(shape.getRotation()) * myPoint.y + (Math.sin(shape.getRotation()) * shape.getCenter().x - Math.cos(shape.getRotation()) * shape.getCenter().y);
-		return new MyPoint(x, y);
+		double rotation = shape.getRotation();
+		AffineTransform affine = new AffineTransform(Math.cos(rotation),- Math.sin(rotation), 
+				Math.sin(rotation), Math.cos(rotation), -shape.getCenter().x/zoom, -shape.getCenter().y/zoom);
+		MyPoint point = new MyPoint();
+		affine.transform(myPoint, point);
+		return point;
 	}
 
 	private boolean lineHitTest(Shape shape, MyPoint myPoint)
@@ -1045,16 +1100,34 @@ public class Controller implements CS355Controller
 	{
 		return handles;
 	}
+	
 
 	public Shape getCurrentShape()
 	{
 		return this.crrntShape;
 	}
+	
 
 	public void finishUpdate()
 	{
 		handle = -1;
 		this.currentStart = null;
 	}
+	
 
+	public double getZoom()
+	{
+		return zoom;
+	}
+
+	public double getHorizontal()
+	{
+		return horizontal;
+	}
+	
+
+	public double getVertical()
+	{
+		return vertical;
+	}
 }
