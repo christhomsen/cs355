@@ -46,16 +46,16 @@ public class Camera
 		this.yaw += rotation;
 	}
 	
-	public void forward(float distance)
+	public void forward(double distance)
 	{
-	    location.x -= distance * (float)Math.sin(Math.toRadians(yaw));
-	    location.z += distance * (float)Math.cos(Math.toRadians(yaw));
+	    location.x -= distance * (double)Math.sin(Math.toRadians(yaw));
+	    location.z += distance * (double)Math.cos(Math.toRadians(yaw));
 	}
 	 
 	//moves the camera backward relative to its current rotation (yaw)
-	public void backwards(float distance)
+	public void backwards(double distance)
 	{
-	    location.x += distance * (float)Math.sin(Math.toRadians(yaw));
-	    location.z -= distance * (float)Math.cos(Math.toRadians(yaw));
+	    location.x += distance * (double)Math.sin(Math.toRadians(yaw));
+	    location.z -= distance * (double)Math.cos(Math.toRadians(yaw));
 	}
 }
