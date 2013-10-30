@@ -9,7 +9,10 @@ package CS355.LWJGL;
 //Therefore, if a command appears in this list, you probably need it.
 //If it doesn't appear in this list, you probably don't.
 //Of course, your milage may vary. Don't feel restricted by this list of imports.
+import java.util.Iterator;
+
 import org.lwjgl.input.Keyboard;
+
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_LINES;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
@@ -35,7 +38,8 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
 public class StudentLWJGLController implements CS355LWJGLController 
 {
   
-  //This is a model of a house.
+  
+//This is a model of a house.
   //It has a single method that returns an iterator full of Line3Ds.
   //A "Line3D" is a wrapper class around two Point2Ds.
   //It should all be fairly intuitive if you look at those classes.
@@ -48,7 +52,15 @@ public class StudentLWJGLController implements CS355LWJGLController
   @Override
   public void resizeGL() 
   {
-	  //TODO
+	  glMatrixMode(GL_PROJECTION);
+	  glLoadIdentity();
+	  float fovy = 60.0f;
+	  float aspect = (float)LWJGLSandbox.DISPLAY_WIDTH/(float)LWJGLSandbox.DISPLAY_HEIGHT;
+	  float  zNear = 1f;
+	  float zFar = 100f;
+	  gluPerspective(fovy, aspect, zNear, zFar);
+	  glMatrixMode(GL_MODELVIEW);
+	  glLoadIdentity();
   }
 
     @Override
@@ -67,43 +79,59 @@ public class StudentLWJGLController implements CS355LWJGLController
     	//TODO
         if(Keyboard.isKeyDown(Keyboard.KEY_W)) 
         {
-            System.out.println("You are pressing W!");
+            this.camera.forward(1);
         }
-        else if(Keyboard.isKeyDown(Keyboard.KEY_S))
+        if(Keyboard.isKeyDown(Keyboard.KEY_S))
         {
-        	
+        	this.camera.backwards(1);
         }
-        else if(Keyboard.isKeyDown(Keyboard.KEY_A))
+        if(Keyboard.isKeyDown(Keyboard.KEY_A))
         {
-        	
+        	this.camera.strafeLeft(1);
         }
-        else if(Keyboard.isKeyDown(Keyboard.KEY_D))
+        if(Keyboard.isKeyDown(Keyboard.KEY_D))
         {
-        	
+        	this.camera.strafeRight(1);
         }
-        else if(Keyboard.isKeyDown(Keyboard.KEY_Q))
+        if(Keyboard.isKeyDown(Keyboard.KEY_Q))
         {
-        	
+        	this.camera.setYaw(-1);
         }
-        else if(Keyboard.isKeyDown(Keyboard.KEY_E))
+        if(Keyboard.isKeyDown(Keyboard.KEY_E))
         {
-        	
+        	this.camera.setYaw(1);
         }
-        else if(Keyboard.isKeyDown(Keyboard.KEY_R))
+        if(Keyboard.isKeyDown(Keyboard.KEY_R))
         {
-            this.camera.setY(-1);
+            this.camera.setY(1);
         }
-        else if(Keyboard.isKeyDown(Keyboard.KEY_F))
+        if(Keyboard.isKeyDown(Keyboard.KEY_F))
         {
-        	this.camera.setY(1);
+        	this.camera.setY(-1);
         }
-        else if(Keyboard.isKeyDown(Keyboard.KEY_O))
+        if(Keyboard.isKeyDown(Keyboard.KEY_O))
         {
-        	
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            glOrtho(-6f, 6f, -6f, 6f, 1f, 100f);
+      	  	glMatrixMode(GL_MODELVIEW);
+      	  	glLoadIdentity();
         }
-        else if(Keyboard.isKeyDown(Keyboard.KEY_P))
+        if(Keyboard.isKeyDown(Keyboard.KEY_P))
         {
-        	
+        	glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+      	  	float fovy = 60.0f;
+      	  	float aspect = (float)LWJGLSandbox.DISPLAY_WIDTH/(float)LWJGLSandbox.DISPLAY_HEIGHT;
+      	  	float  zNear = 1f;
+      	  	float zFar = 100f;
+      	  	gluPerspective(fovy, aspect, zNear, zFar);
+      	  	glMatrixMode(GL_MODELVIEW);
+      	  	glLoadIdentity();
+        }
+        if(Keyboard.isKeyDown(Keyboard.KEY_X))
+        {
+        	this.camera = new Camera();
         }
     }
 
@@ -115,7 +143,35 @@ public class StudentLWJGLController implements CS355LWJGLController
         //This clears the screen.
         glClear(GL_COLOR_BUFFER_BIT);
         
+        glLoadIdentity();
+        this.lookThrough();
+        
+        glColor3f(0, 0, 255);
+        
+        glBegin(GL_LINES);
+        
+        Iterator<Line3D> it = this.model.getLines();
+        
+        while(it.hasNext())
+        {
+        	Line3D line = it.next();
+        	glVertex3d(line.start.x, line.start.y, line.start.z);
+        	glVertex3d(line.end.x, line.end.y, line.end.z);
+        }
+        
+        glEnd();
+        
         //Do your drawing here.
     }
     
+    public void lookThrough()
+    {
+    	float yaw = this.camera.getYaw();
+    	Point3D position = this.camera.getLocation();
+
+        //roatate the yaw around the Y axis
+        glRotatef(yaw, 0.0f, 1.0f, 0.0f);
+        //translate to the position vector's location
+        glTranslatef((float)position.x, (float)position.y, (float)position.z);
+    }
 }

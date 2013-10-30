@@ -2,13 +2,13 @@ package CS355.LWJGL;
 
 public class Camera
 {
-	Point3D location;
-	float yaw;
+	private Point3D location;
+	private float yaw;
 	
 	public Camera()
 	{
-		location = new Point3D(0, 0, 0);
-		yaw = 0;
+		location = new Point3D(0, -3, -15);
+		yaw = 0.0f;
 	}
 
 	public Point3D getLocation()
@@ -46,16 +46,30 @@ public class Camera
 		this.yaw += rotation;
 	}
 	
-	public void forward(double distance)
+	public void forward(float distance)
 	{
-	    location.x -= distance * (double)Math.sin(Math.toRadians(yaw));
-	    location.z += distance * (double)Math.cos(Math.toRadians(yaw));
+	    location.x -= distance * (float)Math.sin(Math.toRadians(yaw));
+	    location.z += distance * (float)Math.cos(Math.toRadians(yaw));
 	}
 	 
 	//moves the camera backward relative to its current rotation (yaw)
-	public void backwards(double distance)
+	public void backwards(float distance)
 	{
-	    location.x += distance * (double)Math.sin(Math.toRadians(yaw));
-	    location.z -= distance * (double)Math.cos(Math.toRadians(yaw));
+	    location.x += distance * (float)Math.sin(Math.toRadians(yaw));
+	    location.z -= distance * (float)Math.cos(Math.toRadians(yaw));
+	}
+	
+	//strafes the camera left relitive to its current rotation (yaw)
+	public void strafeLeft(float distance)
+	{
+	    location.x -= distance * (float)Math.sin(Math.toRadians(yaw-90));
+	    location.z += distance * (float)Math.cos(Math.toRadians(yaw-90));
+	}
+	 
+	//strafes the camera right relitive to its current rotation (yaw)
+	public void strafeRight(float distance)
+	{
+	    location.x -= distance * (float)Math.sin(Math.toRadians(yaw+90));
+	    location.z += distance * (float)Math.cos(Math.toRadians(yaw+90));
 	}
 }
