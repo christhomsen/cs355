@@ -12,7 +12,6 @@ package CS355.LWJGL;
 import java.util.Iterator;
 
 import org.lwjgl.input.Keyboard;
-
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_LINES;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
@@ -76,7 +75,6 @@ public class StudentLWJGLController implements CS355LWJGLController
     @Override
     public void updateKeyboard() 
     {
-    	//TODO
         if(Keyboard.isKeyDown(Keyboard.KEY_W)) 
         {
             this.camera.forward(1);
@@ -139,7 +137,6 @@ public class StudentLWJGLController implements CS355LWJGLController
     @Override
     public void render() 
     {
-    	//TODO
         //This clears the screen.
         glClear(GL_COLOR_BUFFER_BIT);
         

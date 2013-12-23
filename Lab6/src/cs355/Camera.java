@@ -1,15 +1,12 @@
-package CS355.LWJGL;
-
-import CS355.LWJGL.Point3D;
+package cs355;
 
 public class Camera
 {
 	private Point3D location;
 	private float yaw;
-	
 	public Camera()
 	{
-		location = new Point3D(0, -3, -15);
+		location = new Point3D(5, -5, -50);
 		yaw = 0.0f;
 	}
 
@@ -40,7 +37,7 @@ public class Camera
 
 	public float getYaw()
 	{
-		return yaw;
+		return (float) Math.toRadians(yaw);
 	}
 
 	public void setYaw(float rotation)
